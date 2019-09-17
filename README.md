@@ -1,5 +1,11 @@
 # url-shortener
-Url shortener in go
+Url shortener in Go
+
+## Setup
+```bash
+go get github.com/gorilla/mux
+go get github.com/syndtr/goleveldb/leveldb
+```
 
 ## Usage
 ```bash
