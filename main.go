@@ -4,35 +4,33 @@ import (
 	"fmt"
 	"github.com/syndtr/goleveldb/leveldb"
 	"log"
-	"math/rand"
 	"net/http"
+	"crypto/sha256"
+	"encoding/hex"
+	"strings"
 )
 
 var db *leveldb.DB
-
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-func RandStringBytes(n int) string {
-	b := make([]byte, n)
-	for i := range b {
-		b[i] = letterBytes[rand.Intn(len(letterBytes))]
-	}
-	return string(b)
-}
 
 func handlePost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	url := r.PostFormValue("url")
+	if !strings.HasPrefix(url, "http") {
+		w.Write([]byte("Error: Invalid URL\n"))
+		return
+	}
 
-	// TODO: check for collisions
-	key := RandStringBytes(8)
+	h := sha256.New()
+	h.Write([]byte(url))
+	hash := hex.EncodeToString(h.Sum(nil))
+	// take first 4 bytes of hash
+	key := hash[:8]
 
-	// TODO: check if url starts with http://
 	err = db.Put([]byte(key), []byte(url), nil)
-
 	if err != nil {
 		panic(err)
 	}
