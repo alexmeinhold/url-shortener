@@ -3,7 +3,6 @@ Url shortener in Go
 
 ## Setup
 ```bash
-go get github.com/gorilla/mux
 go get github.com/syndtr/goleveldb/leveldb
 go build main.go
 ./main
