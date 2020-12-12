@@ -11,5 +11,5 @@ go build main.go
 ## Usage
 ```bash
 curl -d "url=http://stackoverflow.com" -X POST http://localhost:8080
-# then navigate to returned link to be redirected to url
+# -> http://localhost:8080/81b30731
 ```
