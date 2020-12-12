@@ -1,12 +1,13 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"github.com/syndtr/goleveldb/leveldb"
 	"log"
 	"net/http"
-	"crypto/sha256"
-	"encoding/hex"
+	"regexp"
 	"strings"
 )
 
@@ -41,14 +42,22 @@ func handlePost(w http.ResponseWriter, r *http.Request) {
 
 func handleRedirect(w http.ResponseWriter, r *http.Request) {
 	// 1. get key from url
-	// TODO: check if key is in valid format
 	key := r.URL.Path[1:]
-	// 2. look up key in database to get url
+	// 2. check if key is in valid format
+	matched, err := regexp.MatchString(`^([a-f0-9]{8})$`, key)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if !matched {
+		http.NotFound(w, r)
+		return
+	}
+	// 3. look up key in database to get url
 	newUrl, err := db.Get([]byte(key), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// 3. send redirect response to user with url
+	// 4. send redirect response to user with url
 	http.Redirect(w, r, string(newUrl), http.StatusSeeOther)
 }
 
